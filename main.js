@@ -1,11 +1,39 @@
 const { Worker } = require('worker_threads');
-const worker = new Worker('./worker.js');
 
-const resolve = e => console.log('e', e);
+const normalLoop = (iterations) => {
+    console.time('Total Execution Time');
 
-function start() {
-    worker.on('message', resolve);
-    worker.postMessage('Hello from Main');
+    let sum = 0;
+
+    for (let i = 0; i < iterations; i++) {
+        sum += i;
+    }
+
+    console.timeEnd('Total Execution Time');
+
+    return sum;
+};
+
+function workerLoop(iterations) {
+    console.time('Total Execution Time');
+
+    const worker = new Worker('./worker.js', {
+        workerData: { iterations },
+    });
+
+    worker.on('message', (message) => {
+        console.log('Worker Response:', message);
+    });
+
+    console.timeEnd('Total Execution Time');
 }
 
-start();
+
+const start = (useWorker = false, iterations) => {
+    useWorker ? workerLoop(iterations) : normalLoop(iterations);
+};
+
+const iterations = 10000000;
+const worker = true;
+
+start(worker, iterations);
