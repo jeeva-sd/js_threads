@@ -1,9 +1,13 @@
 const { parentPort, workerData } = require('worker_threads');
-const { iterations } = workerData;
+// const { iterations } = workerData;
 
-let sum = 0;
-for (let i = 0; i < iterations; i++) {
-    sum += i;
-}
+const loop = (message) => {
+    let sum = 0;
+    for (let i = 0; i < message.iterations; i++) {
+        sum += i;
+    }
 
-parentPort.postMessage(`Completed ${iterations} iterations. Sum: ${sum}`);
+    parentPort.postMessage(`Completed ${message.iterations} iterations. Sum: ${sum}`);
+};
+
+parentPort.on('message', loop);
